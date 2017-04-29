@@ -12,6 +12,7 @@
 		00358D371EB499C100D38573 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 00358D351EB499C100D38573 /* Main.storyboard */; };
 		00358D391EB499C100D38573 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00358D381EB499C100D38573 /* Assets.xcassets */; };
 		00358D3C1EB499C100D38573 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 00358D3A1EB499C100D38573 /* LaunchScreen.storyboard */; };
+		B2F04B76CAF4529CA151CCB7 /* Pods_Zboot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6DB47AFB86187F262484843 /* Pods_Zboot.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,9 @@
 		00358D381EB499C100D38573 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		00358D3B1EB499C100D38573 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		00358D3D1EB499C100D38573 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4CA1368DBD2D16C2C33008B4 /* Pods-Zboot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zboot.release.xcconfig"; path = "Pods/Target Support Files/Pods-Zboot/Pods-Zboot.release.xcconfig"; sourceTree = "<group>"; };
+		D6DB47AFB86187F262484843 /* Pods_Zboot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Zboot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E910DFF3E84BAFA703CEEAAB /* Pods-Zboot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zboot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Zboot/Pods-Zboot.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,6 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2F04B76CAF4529CA151CCB7 /* Pods_Zboot.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,6 +45,8 @@
 			children = (
 				00358D301EB499C100D38573 /* Zboot */,
 				00358D2F1EB499C100D38573 /* Products */,
+				1861A33E7306424AAA87273F /* Pods */,
+				E84B6AC1D124372985E208ED /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -64,6 +71,23 @@
 			path = Zboot;
 			sourceTree = "<group>";
 		};
+		1861A33E7306424AAA87273F /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				E910DFF3E84BAFA703CEEAAB /* Pods-Zboot.debug.xcconfig */,
+				4CA1368DBD2D16C2C33008B4 /* Pods-Zboot.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		E84B6AC1D124372985E208ED /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D6DB47AFB86187F262484843 /* Pods_Zboot.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -71,9 +95,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00358D401EB499C200D38573 /* Build configuration list for PBXNativeTarget "Zboot" */;
 			buildPhases = (
+				9ACF53800AB9EFF4715A16FE /* [CP] Check Pods Manifest.lock */,
 				00358D2A1EB499C100D38573 /* Sources */,
 				00358D2B1EB499C100D38573 /* Frameworks */,
 				00358D2C1EB499C100D38573 /* Resources */,
+				9EE6695B825936C9DA69FAEC /* [CP] Embed Pods Frameworks */,
+				BB04B17396AA9ADE906AB3E9 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -131,6 +158,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		9ACF53800AB9EFF4715A16FE /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		9EE6695B825936C9DA69FAEC /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Zboot/Pods-Zboot-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BB04B17396AA9ADE906AB3E9 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Zboot/Pods-Zboot-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		00358D2A1EB499C100D38573 /* Sources */ = {
@@ -261,6 +336,7 @@
 		};
 		00358D411EB499C200D38573 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E910DFF3E84BAFA703CEEAAB /* Pods-Zboot.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = J8YFB2DX8S;
@@ -274,6 +350,7 @@
 		};
 		00358D421EB499C200D38573 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4CA1368DBD2D16C2C33008B4 /* Pods-Zboot.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = J8YFB2DX8S;
