@@ -21,22 +21,26 @@
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="🗑" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c7S-ws-qOX">
-                                <rect key="frame" x="339" y="926" width="90" height="90"/>
+                            <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="🗑" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c7S-ws-qOX">
+                                <rect key="frame" x="334" y="916" width="100" height="100"/>
+                                <gestureRecognizers/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="70" id="qJE-Mr-KFe">
-                                        <variation key="widthClass=regular" constant="90"/>
+                                    <constraint firstAttribute="width" constant="80" id="qJE-Mr-KFe">
+                                        <variation key="widthClass=regular" constant="100"/>
                                     </constraint>
-                                    <constraint firstAttribute="height" constant="70" id="sBU-fg-3uQ">
-                                        <variation key="widthClass=regular" constant="90"/>
+                                    <constraint firstAttribute="height" constant="80" id="sBU-fg-3uQ">
+                                        <variation key="widthClass=regular" constant="100"/>
                                     </constraint>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="60"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="70"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                                 <variation key="widthClass=regular">
-                                    <fontDescription key="fontDescription" type="system" pointSize="80"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="90"/>
                                 </variation>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="mX4-yJ-ot0" appends="YES" id="zRu-A2-bjC"/>
+                                </connections>
                             </label>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -45,8 +49,16 @@
                             <constraint firstItem="c7S-ws-qOX" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="CME-jg-h2u"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="bucket" destination="c7S-ws-qOX" id="gii-xN-BSL"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <panGestureRecognizer minimumNumberOfTouches="1" id="mX4-yJ-ot0">
+                    <connections>
+                        <action selector="moveBucket:" destination="BYZ-38-t0r" id="mnu-fX-kcI"/>
+                    </connections>
+                </panGestureRecognizer>
             </objects>
         </scene>
     </scenes>
