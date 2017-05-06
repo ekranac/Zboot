@@ -11,6 +11,7 @@ import UIKit
 class GameViewController: UIViewController {
     
     @IBOutlet weak var bucket: UILabel!
+    @IBOutlet weak var scoreLabel: UILabel!
     
     fileprivate var gameIsActive: Bool!
 
