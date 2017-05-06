@@ -38,7 +38,7 @@ public class MessagesUtils {
         instructionsLabel.tag = MessagesUtils.tagInstructionsLabel
         instructionsLabel.text = "◀️ Drag the bucket to catch the candies! Avoid fruit & veggies! ▶️"
         instructionsLabel.textAlignment = .center
-        instructionsLabel.font = UIFont(name: Constants.defaultFontName, size: 11.0)
+        instructionsLabel.font = UIFont(name: "Avenir-Medium", size: 11.0)
         
         parentView.addSubview(instructionsLabel)
     }
@@ -54,12 +54,12 @@ public class MessagesUtils {
         titleLabel.tag = MessagesUtils.tagTitleLabel
         titleLabel.text = "zboot"
         titleLabel.textAlignment = .center
-        guard let pixelatedFontUrl = Bundle.main.url(forResource: Constants.pixelatedFontName,
+        guard let pixelatedFontUrl = Bundle.main.url(forResource: "PressStart2P-Regular",
                                                      withExtension: "ttf") else {
                                                         return
         }
         CTFontManagerRegisterFontsForURL(pixelatedFontUrl as CFURL, .process, nil)
-        titleLabel.font = UIFont(name: Constants.pixelatedFontName, size: 40.0)
+        titleLabel.font = UIFont(name: "PressStart2P-Regular", size: 40.0)
         
         let startGameButton = UIButton(frame: CGRect(x: 0.0,
                                                      y: parentView.frame.height / 2 + 20.0,
@@ -67,8 +67,8 @@ public class MessagesUtils {
                                                      height: 20.0))
         startGameButton.tag = MessagesUtils.tagStartGameButton
         startGameButton.setTitle("START GAME", for: .normal)
-        startGameButton.setTitleColor(UIColor(rgb: Constants.orangeColor), for: .normal)
-        startGameButton.titleLabel?.font = UIFont(name: Constants.pixelatedFontName, size: 20.0)
+        startGameButton.setTitleColor(UIColor(rgb: 0xFFAA00), for: .normal)
+        startGameButton.titleLabel?.font = UIFont(name: "PressStart2P-Regular", size: 20.0)
         
         parentView.addSubview(titleLabel)
         parentView.addSubview(startGameButton)
@@ -85,12 +85,12 @@ public class MessagesUtils {
         gameOverLabel.tag = MessagesUtils.tagGameOverLabel
         gameOverLabel.text = "GAME OVER :("
         gameOverLabel.textAlignment = .center
-        guard let pixelatedFontUrl = Bundle.main.url(forResource: Constants.pixelatedFontName,
+        guard let pixelatedFontUrl = Bundle.main.url(forResource: "PressStart2P-Regular",
                                                      withExtension: "ttf") else {
                                                         return
         }
         CTFontManagerRegisterFontsForURL(pixelatedFontUrl as CFURL, .process, nil)
-        gameOverLabel.font = UIFont(name: Constants.pixelatedFontName, size: 20.0)
+        gameOverLabel.font = UIFont(name: "PressStart2P-Regular", size: 20.0)
         
         let retryButton = UIButton(frame: CGRect(x: 0.0,
                                                  y: parentView.frame.height / 2 + 50.0,
@@ -98,8 +98,8 @@ public class MessagesUtils {
                                                  height: 20.0))
         retryButton.tag = MessagesUtils.tagRetryGameButton
         retryButton.setTitle("RETRY", for: .normal)
-        retryButton.setTitleColor(UIColor(rgb: Constants.orangeColor), for: .normal)
-        retryButton.titleLabel?.font = UIFont(name: Constants.pixelatedFontName, size: 17.0)
+        retryButton.setTitleColor(UIColor(rgb: 0xFFAA00), for: .normal)
+        retryButton.titleLabel?.font = UIFont(name: "PressStart2P-Regular", size: 17.0)
         
         parentView.addSubview(gameOverLabel)
         parentView.addSubview(retryButton)
@@ -122,9 +122,9 @@ public class MessagesUtils {
                                                       width: parentView.frame.width,
                                                       height: 40.0))
                 goodLabel.tag = MessagesUtils.tagScreenMessageLabel
-                goodLabel.textColor = UIColor(rgb: Constants.orangeColor)
+                goodLabel.textColor = UIColor(rgb: 0xFFAA00)
                 goodLabel.textAlignment = .center
-                goodLabel.font = UIFont(name: Constants.defaultFontName, size: 16.0)
+                goodLabel.font = UIFont(name: "Avenir-Medium", size: 16.0)
                 goodLabel.text = goodMessages[Int(arc4random_uniform(UInt32(goodMessages.count)))]
                 
                 parentView.addSubview(goodLabel)
@@ -143,7 +143,7 @@ public class MessagesUtils {
             badLabel.tag = MessagesUtils.tagScreenMessageLabel
             badLabel.textColor = .black
             badLabel.textAlignment = .center
-            badLabel.font = UIFont(name: Constants.defaultFontName, size: 16.0)
+            badLabel.font = UIFont(name: "Avenir-Medium", size: 16.0)
             badLabel.text = badMessages[Int(arc4random_uniform(UInt32(badMessages.count)))]
             
             parentView.addSubview(badLabel)
