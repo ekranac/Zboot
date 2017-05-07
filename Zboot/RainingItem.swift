@@ -20,6 +20,7 @@ public class RainingItem: UILabel {
     fileprivate let fruitsAndVeggies = ["🥔", "🍐", "🥝", "🥑", "🥕", "🍆", "🍋"]
     
     dynamic var wasCaught = false
+    fileprivate var isObserved = false
     var type: RainingItemType!
     
     public init(controller: UIViewController) {
@@ -86,6 +87,19 @@ public class RainingItem: UILabel {
         if currentFrame.origin.y < controller.bucket.frame.origin.y && currentFrame.origin.y > (controller.bucket.frame.origin.y - 20.0) && controller.bucket.frame.intersects(currentFrame) {
             self.removeFromSuperview()
         }
+    }
+    
+    override public func addObserver(_ observer: NSObject, forKeyPath keyPath: String, options: NSKeyValueObservingOptions = [], context: UnsafeMutableRawPointer?) {
+        isObserved = true
+        super.addObserver(observer, forKeyPath: keyPath, options: options, context: context)
+    }
+    
+    override public func removeObserver(_ observer: NSObject, forKeyPath keyPath: String, context: UnsafeMutableRawPointer?) {
+        if !isObserved {
+            return
+        }
+        super.removeObserver(observer, forKeyPath: keyPath, context: context)
+        isObserved = false
     }
     
     enum RainingItemType {

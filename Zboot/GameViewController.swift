@@ -46,9 +46,6 @@ class GameViewController: UIViewController {
     
     fileprivate var heartsLeft: Int = 0 {
         willSet {
-            if !gameIsActive {
-                return
-            }
             if newValue == 0 {
                 gameIsActive = false
             }
@@ -83,6 +80,7 @@ class GameViewController: UIViewController {
     func startGame() {
         self.view.subviews.forEach({(view) -> Void in
             if let rainingItem = view as? RainingItem {
+                rainingItem.removeObserver(self, forKeyPath: "wasCaught", context: &GameViewController.kvoContext)
                 rainingItem.removeFromSuperview()
             }
         })
