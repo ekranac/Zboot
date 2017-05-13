@@ -9,15 +9,15 @@
 import UIKit
 
 class GameViewController: UIViewController {
-    
+
     static var kvoContext: UInt = 1
-    
+
     @IBOutlet weak var bucket: UILabel!
     @IBOutlet weak var bucketConstraintX: NSLayoutConstraint!
     @IBOutlet weak var heartsView: HeartsView!
     @IBOutlet weak var scoreLabel: UILabel!
     fileprivate var candyRainTimer: Timer!
-    
+
     fileprivate var messages: MessagesUtils!
     fileprivate var itemsToFallAtOnce = 1
     fileprivate var score = 0 {
@@ -31,7 +31,7 @@ class GameViewController: UIViewController {
             }
         }
     }
-    
+
     var gameIsActive = false {
         willSet {
             if newValue == false {
@@ -39,14 +39,14 @@ class GameViewController: UIViewController {
             }
         }
     }
-    
+
     fileprivate var heartsLeft: Int = 0 {
         willSet {
             if newValue == 0 {
                 gameIsActive = false
             }
             heartsView.setHearts(numberOfHearts: newValue)
-            
+
         }
     }
 
@@ -55,12 +55,12 @@ class GameViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         messages = MessagesUtils(parentController: self)
         messages.showStartGame()
-        
+
         guard let startGameButton = messages.getViewWithTag(tag: MessagesUtils.tagStartGameButton)
             as? UIButton else {
                 return
         }
-        
+
         startGameButton.addTarget(self, action: #selector(startGame), for: .touchUpInside)
     }
 
@@ -68,11 +68,11 @@ class GameViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
+
     override var prefersStatusBarHidden: Bool {
         return true
     }
-    
+
     func startGame() {
         self.view.subviews.forEach({(view) -> Void in
             if let rainingItem = view as? RainingItem {
@@ -80,7 +80,7 @@ class GameViewController: UIViewController {
                 rainingItem.removeFromSuperview()
             }
         })
-        
+
         messages.removeView(withTag: MessagesUtils.tagTitleLabel)
         messages.removeView(withTag: MessagesUtils.tagStartGameButton)
         messages.removeView(withTag: MessagesUtils.tagGameOverLabel)
@@ -91,19 +91,19 @@ class GameViewController: UIViewController {
         scoreLabel.isHidden = false
         messages.showInstructions()
         itemsToFallAtOnce = 1
-        
+
         candyRainTimer = scheduleNewCandyRainTimer(controller: self, withTimeInterval: 1.0)
         gameIsActive = true
     }
-    
+
     fileprivate func endGame() {
         candyRainTimer.invalidate()
         messages.showGameOver()
-        
+
         guard let retryButton = messages.getViewWithTag(tag: MessagesUtils.tagRetryGameButton) as? UIButton else {
             return
         }
-        
+
         retryButton.addTarget(self, action: #selector(startGame), for: .touchUpInside)
     }
 
@@ -118,14 +118,15 @@ class GameViewController: UIViewController {
         }
         let currentConstraintConstantX = bucketConstraintX.constant
         let newConstraintConstantX = currentConstraintConstantX + translation.x
-        
-        if newConstraintConstantX > (-(rootView.frame.width/2)+senderView.frame.width/2) && newConstraintConstantX < (rootView.frame.width/2)-(senderView.frame.width/2) {
+
+        if newConstraintConstantX > (-(rootView.frame.width/2)+senderView.frame.width/2)
+            && newConstraintConstantX < (rootView.frame.width/2)-(senderView.frame.width/2) {
             bucketConstraintX.constant = newConstraintConstantX
             sender.setTranslation(CGPoint.zero, in: self.view)
         }
 
     }
-    
+
     fileprivate func scheduleNewCandyRainTimer(controller: UIViewController,
                                                withTimeInterval interval: TimeInterval) -> Timer {
         guard let viewController = controller as? GameViewController else {
@@ -149,7 +150,7 @@ class GameViewController: UIViewController {
             }
         })
     }
-    
+
     fileprivate func setDifficulty(score: Int) {
         itemsToFallAtOnce = score / 10
         candyRainTimer.invalidate()
@@ -157,7 +158,7 @@ class GameViewController: UIViewController {
         candyRainTimer = scheduleNewCandyRainTimer(controller: self,
                                                    withTimeInterval: interval)
     }
-    
+
     override public func observeValue(forKeyPath keyPath: String?,
                                       of object: Any?,
                                       change: [NSKeyValueChangeKey : Any]?,
@@ -170,7 +171,7 @@ class GameViewController: UIViewController {
             let type = rainingItem.type else {
                 return
         }
-        
+
         if wasCaught {
             switch type {
             case .good:
@@ -188,4 +189,3 @@ class GameViewController: UIViewController {
     }
 
 }
-
