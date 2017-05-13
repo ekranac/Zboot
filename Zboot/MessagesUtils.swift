@@ -115,7 +115,7 @@ public class MessagesUtils {
             let shouldShowMessage = arc4random_uniform(2) == 1
             if shouldShowMessage {
                 // Remove label if still present
-                removeViewWithTag(tag: MessagesUtils.tagScreenMessageLabel)
+                removeView(withTag: MessagesUtils.tagScreenMessageLabel)
                 
                 let goodLabel = UILabel(frame: CGRect(x: 0.0,
                                                       y: parentView.frame.height - 200.0,
@@ -130,12 +130,12 @@ public class MessagesUtils {
                 parentView.addSubview(goodLabel)
                 
                 Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false, block: {(_) in
-                    self.removeViewWithTag(tag: MessagesUtils.tagScreenMessageLabel)
+                    self.removeView(withTag: MessagesUtils.tagScreenMessageLabel)
                 })
             }
         } else {
             // 'Bad' message is always shown as it can appear 3 times max
-            removeViewWithTag(tag: MessagesUtils.tagScreenMessageLabel)
+            removeView(withTag: MessagesUtils.tagScreenMessageLabel)
             let badLabel = UILabel(frame: CGRect(x: 0.0,
                                                  y: parentView.frame.height - 200,
                                                  width: parentView.frame.width,
@@ -149,13 +149,13 @@ public class MessagesUtils {
             parentView.addSubview(badLabel)
             
             Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false, block: {(_) in
-                self.removeViewWithTag(tag: MessagesUtils.tagScreenMessageLabel)
+                self.removeView(withTag: MessagesUtils.tagScreenMessageLabel)
             })
         }
         
     }
     
-    public func removeViewWithTag(tag: Int) {
+    public func removeView(withTag tag: Int) {
         guard let view = parentController.view.viewWithTag(tag) else {
             // No view with such tag found in parent view or view isn't tagged
             return

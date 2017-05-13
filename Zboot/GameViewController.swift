@@ -24,14 +24,10 @@ class GameViewController: UIViewController {
         willSet {
             scoreLabel.text = String(newValue)
             if newValue == 1 {
-                messages.removeViewWithTag(tag: MessagesUtils.tagInstructionsLabel)
+                messages.removeView(withTag: MessagesUtils.tagInstructionsLabel)
             }
             if newValue != 0 && newValue % 10 == 0 {
-                itemsToFallAtOnce = newValue / 10
-                candyRainTimer.invalidate()
-                let interval = TimeInterval(CGFloat(newValue / 10) / 2)
-                candyRainTimer = scheduleNewCandyRainTimer(controller: self,
-                                                           withTimeInterval: interval)
+                setDifficulty(score: newValue)
             }
         }
     }
@@ -85,10 +81,10 @@ class GameViewController: UIViewController {
             }
         })
         
-        messages.removeViewWithTag(tag: MessagesUtils.tagTitleLabel)
-        messages.removeViewWithTag(tag: MessagesUtils.tagStartGameButton)
-        messages.removeViewWithTag(tag: MessagesUtils.tagGameOverLabel)
-        messages.removeViewWithTag(tag: MessagesUtils.tagRetryGameButton)
+        messages.removeView(withTag: MessagesUtils.tagTitleLabel)
+        messages.removeView(withTag: MessagesUtils.tagStartGameButton)
+        messages.removeView(withTag: MessagesUtils.tagGameOverLabel)
+        messages.removeView(withTag: MessagesUtils.tagRetryGameButton)
         score = 0
         heartsLeft = 3
         heartsView.isHidden = false
@@ -152,6 +148,14 @@ class GameViewController: UIViewController {
                 })
             }
         })
+    }
+    
+    fileprivate func setDifficulty(score: Int) {
+        itemsToFallAtOnce = score / 10
+        candyRainTimer.invalidate()
+        let interval = TimeInterval(CGFloat(score / 10) / 2)
+        candyRainTimer = scheduleNewCandyRainTimer(controller: self,
+                                                   withTimeInterval: interval)
     }
     
     override public func observeValue(forKeyPath keyPath: String?,
