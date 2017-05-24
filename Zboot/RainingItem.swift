@@ -10,19 +10,19 @@ import Foundation
 import UIKit
 
 public class RainingItem: UILabel {
-    
+
     fileprivate var controller: GameViewController!
     fileprivate var rootView: UIView!
-    
+
     fileprivate var displayLink: CADisplayLink!
-    
+
     fileprivate let candies = ["🍬", "🍫", "🍩", "🍭", "🍪", "🍦", "🍰", "🍡"]
     fileprivate let fruitsAndVeggies = ["🥔", "🍐", "🥝", "🥑", "🥕", "🍆", "🍋"]
-    
+
     dynamic var wasCaught = false
     fileprivate var isObserved = false
     var type: RainingItemType!
-    
+
     public init(controller: UIViewController) {
         guard let gameController = controller as? GameViewController else {
             super.init(frame: CGRect(x: Double(controller.view.frame.width / 2.0),
@@ -33,7 +33,7 @@ public class RainingItem: UILabel {
         }
         self.controller = gameController
         self.rootView = controller.view
-        
+
         let randomXPosition = Double(arc4random_uniform(
             UInt32(rootView.frame.width - 30.0)))
         super.init(frame: CGRect(x: randomXPosition,
@@ -50,20 +50,20 @@ public class RainingItem: UILabel {
             self.text = fruitsAndVeggies[Int(arc4random_uniform(UInt32(fruitsAndVeggies.count)))]
             self.type = .bad
         }
-        
+
         // Register CADisplayLink to keep track of frame position
         displayLink = CADisplayLink(target: self, selector: #selector(animationDidUpdate))
         displayLink.add(to: .main, forMode: .defaultRunLoopMode)
     }
-    
+
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     deinit {
         self.removeObserver(self.controller!, forKeyPath: "wasCaught", context: &GameViewController.kvoContext)
     }
-    
+
     func fall() {
         UIView.animate(withDuration: 10.0, animations: {() in
             let translationY = self.rootView.frame.height + 35.0
@@ -78,30 +78,37 @@ public class RainingItem: UILabel {
             self.displayLink.invalidate()
         })
     }
-    
+
     func animationDidUpdate(displayLink: CADisplayLink) {
         guard let currentFrame = self.layer.presentation()?.frame else {
             return
         }
-        
-        if currentFrame.origin.y < controller.bucket.frame.origin.y && currentFrame.origin.y > (controller.bucket.frame.origin.y - 20.0) && controller.bucket.frame.intersects(currentFrame) {
+
+        if currentFrame.origin.y < controller.bucket.frame.origin.y &&
+            currentFrame.origin.y > (controller.bucket.frame.origin.y - 20.0) &&
+            controller.bucket.frame.intersects(currentFrame) {
             self.removeFromSuperview()
         }
     }
-    
-    override public func addObserver(_ observer: NSObject, forKeyPath keyPath: String, options: NSKeyValueObservingOptions = [], context: UnsafeMutableRawPointer?) {
+
+    override public func addObserver(_ observer: NSObject,
+                                     forKeyPath keyPath: String,
+                                     options: NSKeyValueObservingOptions = [],
+                                     context: UnsafeMutableRawPointer?) {
         isObserved = true
         super.addObserver(observer, forKeyPath: keyPath, options: options, context: context)
     }
-    
-    override public func removeObserver(_ observer: NSObject, forKeyPath keyPath: String, context: UnsafeMutableRawPointer?) {
+
+    override public func removeObserver(_ observer: NSObject,
+                                        forKeyPath keyPath: String,
+                                        context: UnsafeMutableRawPointer?) {
         if !isObserved {
             return
         }
         super.removeObserver(observer, forKeyPath: keyPath, context: context)
         isObserved = false
     }
-    
+
     enum RainingItemType {
         case bad
         case good
