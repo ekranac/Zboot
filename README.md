@@ -9,6 +9,8 @@ Simple game, originally made in Swift Playgrounds (find [here](https://github.co
  - Save high score 
  - Start the game when user starts sliding the bucket (no need to press the 'Start game' button)
  - Limit candy detection area for X axis (noticeably detects contact in mid-air)# Zboot
+ - [Show confetti](https://cocoapods.org/pods/SAConfettiView) after reaching high score
+ 
 **WWDC Scholarship Winning Project**
 
 Simple game, originally made in Swift Playgrounds (find [here](https://github.com/ekranac/Zboot-Playground))
