@@ -11,7 +11,8 @@ import UIKit
 class GameViewController: UIViewController {
 
     static var kvoContext: UInt = 1
-
+    fileprivate let showedInstructionsKey = "hasBeenShownInstructions"
+    
     @IBOutlet weak var bucket: UILabel!
     @IBOutlet weak var bucketConstraintX: NSLayoutConstraint!
     @IBOutlet weak var heartsView: HeartsView!
@@ -25,6 +26,7 @@ class GameViewController: UIViewController {
             scoreLabel.text = String(newValue)
             if newValue == 1 {
                 messages.removeView(withTag: MessagesUtils.tagInstructionsLabel)
+                UserDefaults.standard.set(true, forKey: showedInstructionsKey)
             }
             if newValue != 0 && newValue % 10 == 0 {
                 setDifficulty(score: newValue)
@@ -89,9 +91,11 @@ class GameViewController: UIViewController {
         heartsLeft = 3
         heartsView.isHidden = false
         scoreLabel.isHidden = false
-        messages.showInstructions()
         itemsToFallAtOnce = 1
-
+        
+        if !UserDefaults.standard.bool(forKey: showedInstructionsKey) {
+            messages.showInstructions()
+        }
         candyRainTimer = scheduleNewCandyRainTimer(controller: self, withTimeInterval: 1.0)
         gameIsActive = true
     }
