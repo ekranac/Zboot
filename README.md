@@ -11,4 +11,5 @@ Simple game, originally made in Swift Playgrounds (find [here](https://github.co
  - Start the game when user starts sliding the bucket (no need to press the 'Start game' button)
  - Limit candy detection area for X axis (noticeably detects contact in mid-air)# Zboot
  - [Show confetti](https://cocoapods.org/pods/SAConfettiView) after reaching high score
+ - Support for iPad
  
