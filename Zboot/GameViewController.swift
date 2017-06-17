@@ -9,6 +9,12 @@
 import UIKit
 
 class GameViewController: UIViewController {
+    
+    enum GameState {
+        case active
+        case inactive
+        case paused
+    }
 
     static var kvoContext: UInt = 1
     fileprivate let showedInstructionsKey = "hasBeenShownInstructions"
@@ -17,10 +23,12 @@ class GameViewController: UIViewController {
     @IBOutlet weak var bucketConstraintX: NSLayoutConstraint!
     @IBOutlet weak var heartsView: HeartsView!
     @IBOutlet weak var scoreLabel: UILabel!
+    @IBOutlet weak var gameStateButton: UIButton!
     fileprivate var candyRainTimer: Timer!
 
     fileprivate var messages: MessagesUtils!
     fileprivate var itemsToFallAtOnce = 1
+    fileprivate var interval = 1.0
     fileprivate var score = 0 {
         willSet {
             scoreLabel.text = String(newValue)
@@ -33,11 +41,18 @@ class GameViewController: UIViewController {
             }
         }
     }
-
-    var gameIsActive = false {
+    
+    var wasPaused = false
+    var gameState = GameState.inactive {
         willSet {
-            if newValue == false {
+            switch newValue {
+            case .active:
+                wasPaused = gameState == .paused
+                startOrResumeGame()
+            case .inactive:
                 endGame()
+            case .paused:
+                pauseGame()
             }
         }
     }
@@ -45,7 +60,7 @@ class GameViewController: UIViewController {
     fileprivate var heartsLeft: Int = 0 {
         willSet {
             if newValue == 0 {
-                gameIsActive = false
+                gameState = .inactive
             }
             heartsView.setHearts(numberOfHearts: newValue)
 
@@ -63,7 +78,7 @@ class GameViewController: UIViewController {
                 return
         }
 
-        startGameButton.addTarget(self, action: #selector(startGame), for: .touchUpInside)
+        startGameButton.addTarget(self, action: #selector(setGameState), for: .touchUpInside)
     }
 
     override func didReceiveMemoryWarning() {
@@ -74,45 +89,74 @@ class GameViewController: UIViewController {
     override var prefersStatusBarHidden: Bool {
         return true
     }
+    
+    @objc fileprivate func setGameState(sender: UIView) {
+        switch sender.tag {
+        case MessagesUtils.tagStartGameButton, MessagesUtils.tagRetryGameButton:
+            gameState = .active
+            break
+        default:
+            break
+        }
+    }
 
-    func startGame() {
+    func startOrResumeGame() {
+        candyRainTimer = scheduleNewCandyRainTimer(controller: self, withTimeInterval: interval)
+        if !wasPaused {
+            self.view.subviews.forEach({(view) -> Void in
+                if let rainingItem = view as? RainingItem {
+                    rainingItem.removeObserver(self, forKeyPath: "wasCaught", context: &GameViewController.kvoContext)
+                    rainingItem.removeFromSuperview()
+                }
+            })
+            
+            messages.removeView(withTag: MessagesUtils.tagTitleLabel)
+            messages.removeView(withTag: MessagesUtils.tagStartGameButton)
+            messages.removeView(withTag: MessagesUtils.tagGameOverLabel)
+            messages.removeView(withTag: MessagesUtils.tagRetryGameButton)
+            score = 0
+            heartsLeft = 3
+            interval = 1.0
+            gameStateButton.isHidden = false
+            heartsView.isHidden = false
+            scoreLabel.isHidden = false
+            itemsToFallAtOnce = 1
+            
+            if !UserDefaults.standard.bool(forKey: showedInstructionsKey) {
+                messages.showInstructions()
+            }
+        } else {
+            self.view.subviews.forEach({(view) -> Void in
+                if let rainingItem = view as? RainingItem {
+                    rainingItem.resume()
+                }
+            })
+        }
+    }
+    
+    func pauseGame() {
+        candyRainTimer.invalidate()
         self.view.subviews.forEach({(view) -> Void in
             if let rainingItem = view as? RainingItem {
-                rainingItem.removeObserver(self, forKeyPath: "wasCaught", context: &GameViewController.kvoContext)
-                rainingItem.removeFromSuperview()
+                rainingItem.pause()
             }
         })
-
-        messages.removeView(withTag: MessagesUtils.tagTitleLabel)
-        messages.removeView(withTag: MessagesUtils.tagStartGameButton)
-        messages.removeView(withTag: MessagesUtils.tagGameOverLabel)
-        messages.removeView(withTag: MessagesUtils.tagRetryGameButton)
-        score = 0
-        heartsLeft = 3
-        heartsView.isHidden = false
-        scoreLabel.isHidden = false
-        itemsToFallAtOnce = 1
-        
-        if !UserDefaults.standard.bool(forKey: showedInstructionsKey) {
-            messages.showInstructions()
-        }
-        candyRainTimer = scheduleNewCandyRainTimer(controller: self, withTimeInterval: 1.0)
-        gameIsActive = true
     }
 
     fileprivate func endGame() {
         candyRainTimer.invalidate()
         messages.showGameOver()
+        gameStateButton.isHidden = true
 
         guard let retryButton = messages.getViewWithTag(tag: MessagesUtils.tagRetryGameButton) as? UIButton else {
             return
         }
 
-        retryButton.addTarget(self, action: #selector(startGame), for: .touchUpInside)
+        retryButton.addTarget(self, action: #selector(setGameState), for: .touchUpInside)
     }
 
     @IBAction func moveBucket(_ sender: UIPanGestureRecognizer) {
-        if !gameIsActive {
+        if gameState != .active {
             return
         }
         let translation = sender.translation(in: self.view)
@@ -130,6 +174,17 @@ class GameViewController: UIViewController {
         }
 
     }
+    
+    @IBAction func changeGameStateClick(_ sender: UIButton) {
+        if gameState == .active {
+            gameStateButton.setTitle("▶️", for: UIControlState.normal)
+            gameState = .paused
+        } else {
+            gameStateButton.setTitle("⏸", for: UIControlState.normal)
+            gameState = .active
+        }
+    }
+    
 
     fileprivate func scheduleNewCandyRainTimer(controller: UIViewController,
                                                withTimeInterval interval: TimeInterval) -> Timer {
@@ -150,6 +205,9 @@ class GameViewController: UIViewController {
                                             forKeyPath: "wasCaught",
                                             options: .new,
                                             context: &GameViewController.kvoContext)
+                    if self.gameState != .active {
+                        rainingItem.pause()
+                    }
                 })
             }
         })
@@ -158,7 +216,7 @@ class GameViewController: UIViewController {
     fileprivate func setDifficulty(score: Int) {
         itemsToFallAtOnce = score / 10
         candyRainTimer.invalidate()
-        let interval = TimeInterval(CGFloat(score / 10) / 2)
+        interval = TimeInterval(CGFloat(score / 10) / 2)
         candyRainTimer = scheduleNewCandyRainTimer(controller: self,
                                                    withTimeInterval: interval)
     }
@@ -167,7 +225,7 @@ class GameViewController: UIViewController {
                                       of object: Any?,
                                       change: [NSKeyValueChangeKey : Any]?,
                                       context: UnsafeMutableRawPointer?) {
-        guard context == &GameViewController.kvoContext, keyPath=="wasCaught", gameIsActive == true else {
+        guard context == &GameViewController.kvoContext, keyPath=="wasCaught", gameState == .active else {
             return
         }
         guard let wasCaught = change?[.newKey] as? Bool,
