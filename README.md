@@ -5,8 +5,8 @@ Simple game, originally made in Swift Playgrounds (find [here](https://github.co
 
 
 ###  TO DO
- - Play/ Pause button
- - Display instructions label only the first session
+ - Play/ Pause button (on develop)
+ - Display instructions label only the first session (on develop)
  - Save high score 
  - Start the game when user starts sliding the bucket (no need to press the 'Start game' button)
  - Limit candy detection area for X axis (noticeably detects contact in mid-air)# Zboot
