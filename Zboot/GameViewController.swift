@@ -6,6 +6,7 @@
 //  Copyright © 2017 Ziga Besal. All rights reserved.
 //
 
+import SAConfettiView
 import UIKit
 
 class GameViewController: UIViewController {
@@ -17,7 +18,8 @@ class GameViewController: UIViewController {
     }
 
     static var kvoContext: UInt = 1
-    fileprivate let showedInstructionsKey = "hasBeenShownInstructions"
+    fileprivate let highScoreKey = "highScore"
+    fileprivate let showInstructionsKey = "shouldShowInstructions"
     
     @IBOutlet weak var bucket: UILabel!
     @IBOutlet weak var bucketConstraintX: NSLayoutConstraint!
@@ -28,13 +30,14 @@ class GameViewController: UIViewController {
 
     fileprivate var messages: MessagesUtils!
     fileprivate var itemsToFallAtOnce = 1
+    fileprivate var highScore: Int!
     fileprivate var interval = 1.0
     fileprivate var score = 0 {
         willSet {
             scoreLabel.text = String(newValue)
             if newValue == 1 {
                 messages.removeView(withTag: MessagesUtils.tagInstructionsLabel)
-                UserDefaults.standard.set(true, forKey: showedInstructionsKey)
+                UserDefaults.standard.set(false, forKey: showInstructionsKey)
             }
             if newValue != 0 && newValue % 10 == 0 {
                 setDifficulty(score: newValue)
@@ -69,9 +72,12 @@ class GameViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
         messages = MessagesUtils(parentController: self)
         messages.showStartGame()
+        
+        highScore = UserDefaults.standard.integer(forKey: highScoreKey)
+        scoreLabel.text = String(highScore)
 
         guard let startGameButton = messages.getViewWithTag(tag: MessagesUtils.tagStartGameButton)
             as? UIButton else {
@@ -119,10 +125,9 @@ class GameViewController: UIViewController {
             interval = 1.0
             gameStateButton.isHidden = false
             heartsView.isHidden = false
-            scoreLabel.isHidden = false
             itemsToFallAtOnce = 1
             
-            if !UserDefaults.standard.bool(forKey: showedInstructionsKey) {
+            if UserDefaults.standard.bool(forKey: showInstructionsKey) {
                 messages.showInstructions()
             }
         } else {
@@ -144,6 +149,20 @@ class GameViewController: UIViewController {
     }
 
     fileprivate func endGame() {
+        if highScore < score {
+            highScore = score
+            UserDefaults.standard.set(highScore, forKey: highScoreKey)
+            
+            let confettiView = SAConfettiView(frame: self.view.bounds)
+            self.view.addSubview(confettiView)
+            confettiView.type = .Confetti
+            confettiView.startConfetti()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: {() in
+                confettiView.stopConfetti()
+                confettiView.removeFromSuperview()
+            })
+        }
         candyRainTimer.invalidate()
         messages.showGameOver()
         gameStateButton.isHidden = true

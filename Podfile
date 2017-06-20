@@ -6,5 +6,5 @@ target 'Zboot' do
   use_frameworks!
 
   # Pods for Zboot
-
+  pod "SAConfettiView"
 end
