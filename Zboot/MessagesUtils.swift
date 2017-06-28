@@ -74,7 +74,7 @@ public class MessagesUtils {
         parentView.addSubview(startGameButton)
     }
 
-    public func showGameOver() {
+    public func showGameOver(didAchieveHighScore: Bool) {
         guard let parentView = parentController.view else {
             return
         }
@@ -83,7 +83,7 @@ public class MessagesUtils {
                                                   width: parentView.frame.width,
                                                   height: 30.0))
         gameOverLabel.tag = MessagesUtils.tagGameOverLabel
-        gameOverLabel.text = "GAME OVER :("
+        gameOverLabel.text = didAchieveHighScore ? "HIGH SCORE" : "GAME OVER :("
         gameOverLabel.textAlignment = .center
         guard let pixelatedFontUrl = Bundle.main.url(forResource: "PressStart2P-Regular",
                                                      withExtension: "ttf") else {

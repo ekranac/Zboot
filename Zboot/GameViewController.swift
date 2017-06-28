@@ -27,6 +27,7 @@ class GameViewController: UIViewController {
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var gameStateButton: UIButton!
     fileprivate var candyRainTimer: Timer!
+    fileprivate var confettiView: SAConfettiView!
 
     fileprivate var messages: MessagesUtils!
     fileprivate var itemsToFallAtOnce = 1
@@ -78,12 +79,13 @@ class GameViewController: UIViewController {
         
         highScore = UserDefaults.standard.integer(forKey: highScoreKey)
         scoreLabel.text = String(highScore)
+        confettiView = SAConfettiView(frame: self.view.frame)
+        confettiView.type = .Confetti
 
         guard let startGameButton = messages.getViewWithTag(tag: MessagesUtils.tagStartGameButton)
             as? UIButton else {
                 return
         }
-
         startGameButton.addTarget(self, action: #selector(setGameState), for: .touchUpInside)
     }
 
@@ -115,6 +117,10 @@ class GameViewController: UIViewController {
                     rainingItem.removeFromSuperview()
                 }
             })
+            if confettiView != nil {
+                confettiView.stopConfetti()
+                confettiView.removeFromSuperview()
+            }
             
             messages.removeView(withTag: MessagesUtils.tagTitleLabel)
             messages.removeView(withTag: MessagesUtils.tagStartGameButton)
@@ -149,22 +155,32 @@ class GameViewController: UIViewController {
     }
 
     fileprivate func endGame() {
-        if highScore < score {
+        let newHighScore = highScore < score
+        if newHighScore {
             highScore = score
             UserDefaults.standard.set(highScore, forKey: highScoreKey)
             
-            let confettiView = SAConfettiView(frame: self.view.bounds)
-            self.view.addSubview(confettiView)
-            confettiView.type = .Confetti
+            // The falling confetti acutally doesn't remain within frame bounds, how bow dah
+            // Imagine how confused I had been for the last 30 mins
+            confettiView.frame.origin.y = -self.view.frame.size.height
+            confettiView.alpha = 0.3
             confettiView.startConfetti()
+            self.view.addSubview(confettiView)
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: {() in
-                confettiView.stopConfetti()
-                confettiView.removeFromSuperview()
-            })
+            UIView.animate(withDuration: 3.0, delay: 0.0, options: [], animations: {
+                self.confettiView.transform = CGAffineTransform.init(translationX: 0, y: self.view.frame.size.height)
+                self.confettiView.alpha = 1
+            }) { (_) in
+                UIView.animate(withDuration: 3.0, delay: 0.0, options: [.curveLinear], animations: {
+                    self.confettiView.transform = CGAffineTransform.init(translationX: 0, y: self.view.frame.size.height)
+                    self.confettiView.alpha = 0
+                }, completion: { (_) in
+                    self.confettiView.stopConfetti()
+                })
+            }
         }
         candyRainTimer.invalidate()
-        messages.showGameOver()
+        messages.showGameOver(didAchieveHighScore: newHighScore)
         gameStateButton.isHidden = true
 
         guard let retryButton = messages.getViewWithTag(tag: MessagesUtils.tagRetryGameButton) as? UIButton else {
