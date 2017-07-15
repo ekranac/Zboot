@@ -90,13 +90,13 @@ public class RainingItem: UILabel {
             self.removeFromSuperview()
         }
     }
-    
+
     func pause() {
         let pausedTime = layer.convertTime(CACurrentMediaTime(), from: nil)
         layer.speed = 0
         layer.timeOffset = pausedTime
     }
-    
+
     func resume() {
         let pausedTime = layer.timeOffset
         layer.speed = 1.0

@@ -10,7 +10,7 @@ import SAConfettiView
 import UIKit
 
 class GameViewController: UIViewController {
-    
+
     enum GameState {
         case active
         case inactive
@@ -20,7 +20,7 @@ class GameViewController: UIViewController {
     static var kvoContext: UInt = 1
     fileprivate let highScoreKey = "highScore"
     fileprivate let showInstructionsKey = "shouldShowInstructions"
-    
+
     @IBOutlet weak var bucket: UILabel!
     @IBOutlet weak var bucketConstraintX: NSLayoutConstraint!
     @IBOutlet weak var heartsView: HeartsView!
@@ -45,7 +45,7 @@ class GameViewController: UIViewController {
             }
         }
     }
-    
+
     var wasPaused = false
     var gameState = GameState.inactive {
         willSet {
@@ -73,10 +73,10 @@ class GameViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         messages = MessagesUtils(parentController: self)
         messages.showStartGame()
-        
+
         highScore = UserDefaults.standard.integer(forKey: highScoreKey)
         scoreLabel.text = String(highScore)
         confettiView = SAConfettiView(frame: self.view.frame)
@@ -97,7 +97,7 @@ class GameViewController: UIViewController {
     override var prefersStatusBarHidden: Bool {
         return true
     }
-    
+
     @objc fileprivate func setGameState(sender: UIView) {
         switch sender.tag {
         case MessagesUtils.tagStartGameButton, MessagesUtils.tagRetryGameButton:
@@ -121,7 +121,7 @@ class GameViewController: UIViewController {
                 confettiView.stopConfetti()
                 confettiView.removeFromSuperview()
             }
-            
+
             messages.removeView(withTag: MessagesUtils.tagTitleLabel)
             messages.removeView(withTag: MessagesUtils.tagStartGameButton)
             messages.removeView(withTag: MessagesUtils.tagGameOverLabel)
@@ -132,7 +132,7 @@ class GameViewController: UIViewController {
             gameStateButton.isHidden = false
             heartsView.isHidden = false
             itemsToFallAtOnce = 1
-            
+
             if UserDefaults.standard.bool(forKey: showInstructionsKey) {
                 messages.showInstructions()
             }
@@ -144,7 +144,7 @@ class GameViewController: UIViewController {
             })
         }
     }
-    
+
     func pauseGame() {
         candyRainTimer.invalidate()
         self.view.subviews.forEach({(view) -> Void in
@@ -159,20 +159,23 @@ class GameViewController: UIViewController {
         if newHighScore {
             highScore = score
             UserDefaults.standard.set(highScore, forKey: highScoreKey)
-            
+
             // The falling confetti acutally doesn't remain within frame bounds, how bow dah
             // Imagine how confused I had been for the last 30 mins
             confettiView.frame.origin.y = -self.view.frame.size.height
             confettiView.alpha = 0.3
             confettiView.startConfetti()
             self.view.addSubview(confettiView)
-            
+
             UIView.animate(withDuration: 3.0, delay: 0.0, options: [], animations: {
                 self.confettiView.transform = CGAffineTransform.init(translationX: 0, y: self.view.frame.size.height)
                 self.confettiView.alpha = 1
             }) { (_) in
                 UIView.animate(withDuration: 3.0, delay: 0.0, options: [.curveLinear], animations: {
-                    self.confettiView.transform = CGAffineTransform.init(translationX: 0, y: self.view.frame.size.height)
+                    self.confettiView.transform = CGAffineTransform.init(
+                        translationX: 0,
+                        y: self.view.frame.size.height
+                    )
                     self.confettiView.alpha = 0
                 }, completion: { (_) in
                     self.confettiView.stopConfetti()
@@ -209,7 +212,7 @@ class GameViewController: UIViewController {
         }
 
     }
-    
+
     @IBAction func changeGameStateClick(_ sender: UIButton) {
         if gameState == .active {
             gameStateButton.setTitle("▶️", for: UIControlState.normal)
@@ -219,7 +222,6 @@ class GameViewController: UIViewController {
             gameState = .active
         }
     }
-    
 
     fileprivate func scheduleNewCandyRainTimer(controller: UIViewController,
                                                withTimeInterval interval: TimeInterval) -> Timer {

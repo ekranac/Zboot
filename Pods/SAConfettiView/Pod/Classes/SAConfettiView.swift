@@ -23,7 +23,7 @@ public class SAConfettiView: UIView {
     public var colors: [UIColor]!
     public var intensity: Float!
     public var type: ConfettiType!
-    private var active :Bool!
+    private var active: Bool!
 
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -104,7 +104,7 @@ public class SAConfettiView: UIView {
         confetti.color = color.cgColor
         confetti.velocity = CGFloat(350.0 * intensity)
         confetti.velocityRange = CGFloat(80.0 * intensity)
-        confetti.emissionLongitude = CGFloat(M_PI)
+        confetti.emissionLongitude = CGFloat.pi
         confetti.emissionRange = CGFloat(M_PI_4)
         confetti.spin = CGFloat(3.5 * intensity)
         confetti.spinRange = CGFloat(4.0 * intensity)
