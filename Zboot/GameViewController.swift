@@ -6,25 +6,39 @@
 //  Copyright © 2017 Ziga Besal. All rights reserved.
 //
 
+import SAConfettiView
 import UIKit
 
 class GameViewController: UIViewController {
 
+    enum GameState {
+        case active
+        case inactive
+        case paused
+    }
+
     static var kvoContext: UInt = 1
+    fileprivate let highScoreKey = "highScore"
+    fileprivate let showInstructionsKey = "shouldShowInstructions"
 
     @IBOutlet weak var bucket: UILabel!
     @IBOutlet weak var bucketConstraintX: NSLayoutConstraint!
     @IBOutlet weak var heartsView: HeartsView!
     @IBOutlet weak var scoreLabel: UILabel!
+    @IBOutlet weak var gameStateButton: UIButton!
     fileprivate var candyRainTimer: Timer!
+    fileprivate var confettiView: SAConfettiView!
 
     fileprivate var messages: MessagesUtils!
     fileprivate var itemsToFallAtOnce = 1
+    fileprivate var highScore: Int!
+    fileprivate var interval = 1.0
     fileprivate var score = 0 {
         willSet {
             scoreLabel.text = String(newValue)
             if newValue == 1 {
                 messages.removeView(withTag: MessagesUtils.tagInstructionsLabel)
+                UserDefaults.standard.set(false, forKey: showInstructionsKey)
             }
             if newValue != 0 && newValue % 10 == 0 {
                 setDifficulty(score: newValue)
@@ -32,10 +46,17 @@ class GameViewController: UIViewController {
         }
     }
 
-    var gameIsActive = false {
+    var wasPaused = false
+    var gameState = GameState.inactive {
         willSet {
-            if newValue == false {
+            switch newValue {
+            case .active:
+                wasPaused = gameState == .paused
+                startOrResumeGame()
+            case .inactive:
                 endGame()
+            case .paused:
+                pauseGame()
             }
         }
     }
@@ -43,7 +64,7 @@ class GameViewController: UIViewController {
     fileprivate var heartsLeft: Int = 0 {
         willSet {
             if newValue == 0 {
-                gameIsActive = false
+                gameState = .inactive
             }
             heartsView.setHearts(numberOfHearts: newValue)
 
@@ -52,16 +73,20 @@ class GameViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+
         messages = MessagesUtils(parentController: self)
         messages.showStartGame()
+
+        highScore = UserDefaults.standard.integer(forKey: highScoreKey)
+        scoreLabel.text = String(highScore)
+        confettiView = SAConfettiView(frame: self.view.frame)
+        confettiView.type = .Confetti
 
         guard let startGameButton = messages.getViewWithTag(tag: MessagesUtils.tagStartGameButton)
             as? UIButton else {
                 return
         }
-
-        startGameButton.addTarget(self, action: #selector(startGame), for: .touchUpInside)
+        startGameButton.addTarget(self, action: #selector(setGameState), for: .touchUpInside)
     }
 
     override func didReceiveMemoryWarning() {
@@ -73,42 +98,103 @@ class GameViewController: UIViewController {
         return true
     }
 
-    func startGame() {
+    @objc fileprivate func setGameState(sender: UIView) {
+        switch sender.tag {
+        case MessagesUtils.tagStartGameButton, MessagesUtils.tagRetryGameButton:
+            gameState = .active
+            break
+        default:
+            break
+        }
+    }
+
+    func startOrResumeGame() {
+        candyRainTimer = scheduleNewCandyRainTimer(controller: self, withTimeInterval: interval)
+        if !wasPaused {
+            self.view.subviews.forEach({(view) -> Void in
+                if let rainingItem = view as? RainingItem {
+                    rainingItem.removeObserver(self, forKeyPath: "wasCaught", context: &GameViewController.kvoContext)
+                    rainingItem.removeFromSuperview()
+                }
+            })
+            if confettiView != nil {
+                confettiView.stopConfetti()
+                confettiView.removeFromSuperview()
+            }
+
+            messages.removeView(withTag: MessagesUtils.tagTitleLabel)
+            messages.removeView(withTag: MessagesUtils.tagStartGameButton)
+            messages.removeView(withTag: MessagesUtils.tagGameOverLabel)
+            messages.removeView(withTag: MessagesUtils.tagRetryGameButton)
+            score = 0
+            heartsLeft = 3
+            interval = 1.0
+            gameStateButton.isHidden = false
+            heartsView.isHidden = false
+            itemsToFallAtOnce = 1
+
+            if UserDefaults.standard.bool(forKey: showInstructionsKey) {
+                messages.showInstructions()
+            }
+        } else {
+            self.view.subviews.forEach({(view) -> Void in
+                if let rainingItem = view as? RainingItem {
+                    rainingItem.resume()
+                }
+            })
+        }
+    }
+
+    func pauseGame() {
+        candyRainTimer.invalidate()
         self.view.subviews.forEach({(view) -> Void in
             if let rainingItem = view as? RainingItem {
-                rainingItem.removeObserver(self, forKeyPath: "wasCaught", context: &GameViewController.kvoContext)
-                rainingItem.removeFromSuperview()
+                rainingItem.pause()
             }
         })
-
-        messages.removeView(withTag: MessagesUtils.tagTitleLabel)
-        messages.removeView(withTag: MessagesUtils.tagStartGameButton)
-        messages.removeView(withTag: MessagesUtils.tagGameOverLabel)
-        messages.removeView(withTag: MessagesUtils.tagRetryGameButton)
-        score = 0
-        heartsLeft = 3
-        heartsView.isHidden = false
-        scoreLabel.isHidden = false
-        messages.showInstructions()
-        itemsToFallAtOnce = 1
-
-        candyRainTimer = scheduleNewCandyRainTimer(controller: self, withTimeInterval: 1.0)
-        gameIsActive = true
     }
 
     fileprivate func endGame() {
+        let newHighScore = highScore < score
+        if newHighScore {
+            highScore = score
+            UserDefaults.standard.set(highScore, forKey: highScoreKey)
+
+            // The falling confetti acutally doesn't remain within frame bounds, how bow dah
+            // Imagine how confused I had been for the last 30 mins
+            confettiView.frame.origin.y = -self.view.frame.size.height
+            confettiView.alpha = 0.3
+            confettiView.startConfetti()
+            self.view.addSubview(confettiView)
+
+            UIView.animate(withDuration: 3.0, delay: 0.0, options: [], animations: {
+                self.confettiView.transform = CGAffineTransform.init(translationX: 0, y: self.view.frame.size.height)
+                self.confettiView.alpha = 1
+            }) { (_) in
+                UIView.animate(withDuration: 3.0, delay: 0.0, options: [.curveLinear], animations: {
+                    self.confettiView.transform = CGAffineTransform.init(
+                        translationX: 0,
+                        y: self.view.frame.size.height
+                    )
+                    self.confettiView.alpha = 0
+                }, completion: { (_) in
+                    self.confettiView.stopConfetti()
+                })
+            }
+        }
         candyRainTimer.invalidate()
-        messages.showGameOver()
+        messages.showGameOver(didAchieveHighScore: newHighScore)
+        gameStateButton.isHidden = true
 
         guard let retryButton = messages.getViewWithTag(tag: MessagesUtils.tagRetryGameButton) as? UIButton else {
             return
         }
 
-        retryButton.addTarget(self, action: #selector(startGame), for: .touchUpInside)
+        retryButton.addTarget(self, action: #selector(setGameState), for: .touchUpInside)
     }
 
     @IBAction func moveBucket(_ sender: UIPanGestureRecognizer) {
-        if !gameIsActive {
+        if gameState != .active {
             return
         }
         let translation = sender.translation(in: self.view)
@@ -125,6 +211,16 @@ class GameViewController: UIViewController {
             sender.setTranslation(CGPoint.zero, in: self.view)
         }
 
+    }
+
+    @IBAction func changeGameStateClick(_ sender: UIButton) {
+        if gameState == .active {
+            gameStateButton.setTitle("▶️", for: UIControlState.normal)
+            gameState = .paused
+        } else {
+            gameStateButton.setTitle("⏸", for: UIControlState.normal)
+            gameState = .active
+        }
     }
 
     fileprivate func scheduleNewCandyRainTimer(controller: UIViewController,
@@ -146,6 +242,9 @@ class GameViewController: UIViewController {
                                             forKeyPath: "wasCaught",
                                             options: .new,
                                             context: &GameViewController.kvoContext)
+                    if self.gameState != .active {
+                        rainingItem.pause()
+                    }
                 })
             }
         })
@@ -154,7 +253,7 @@ class GameViewController: UIViewController {
     fileprivate func setDifficulty(score: Int) {
         itemsToFallAtOnce = score / 10
         candyRainTimer.invalidate()
-        let interval = TimeInterval(CGFloat(score / 10) / 2)
+        interval = TimeInterval(CGFloat(score / 10) / 2)
         candyRainTimer = scheduleNewCandyRainTimer(controller: self,
                                                    withTimeInterval: interval)
     }
@@ -163,7 +262,7 @@ class GameViewController: UIViewController {
                                       of object: Any?,
                                       change: [NSKeyValueChangeKey : Any]?,
                                       context: UnsafeMutableRawPointer?) {
-        guard context == &GameViewController.kvoContext, keyPath=="wasCaught", gameIsActive == true else {
+        guard context == &GameViewController.kvoContext, keyPath=="wasCaught", gameState == .active else {
             return
         }
         guard let wasCaught = change?[.newKey] as? Bool,

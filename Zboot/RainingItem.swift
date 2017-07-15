@@ -91,6 +91,21 @@ public class RainingItem: UILabel {
         }
     }
 
+    func pause() {
+        let pausedTime = layer.convertTime(CACurrentMediaTime(), from: nil)
+        layer.speed = 0
+        layer.timeOffset = pausedTime
+    }
+
+    func resume() {
+        let pausedTime = layer.timeOffset
+        layer.speed = 1.0
+        layer.timeOffset = 0.0
+        layer.beginTime = 0.0
+        let timeSincePause: CFTimeInterval = layer.convertTime(CACurrentMediaTime(), from: nil) - pausedTime
+        layer.beginTime = timeSincePause
+    }
+
     override public func addObserver(_ observer: NSObject,
                                      forKeyPath keyPath: String,
                                      options: NSKeyValueObservingOptions = [],
