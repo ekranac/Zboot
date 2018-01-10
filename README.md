@@ -13,4 +13,5 @@ Simple game, originally made in Swift Playgrounds (find [here](https://github.co
  - [Show confetti](https://cocoapods.org/pods/SAConfettiView) after reaching high score **[Released]**
  - Support for iPad & iPhone X
  - Share high score
+ - New app icon
  
