@@ -79,7 +79,7 @@ public class RainingItem: UILabel {
         })
     }
 
-    func animationDidUpdate(displayLink: CADisplayLink) {
+    @objc func animationDidUpdate(displayLink: CADisplayLink) {
         guard let currentFrame = self.layer.presentation()?.frame else {
             return
         }
