@@ -28,7 +28,7 @@ class HeartsView: UIStackView {
 
             heartLabel.text = hearts > index ? "❤️" : ""
             heartLabel.textAlignment = .center
-            heartLabel.font = UIFont(name: "Avenir-Medium", size: 30.0)
+            heartLabel.font = UIFont(name: "Avenir-Medium", size: UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.pad ? 60.0 : 30.0)
 
             heartLabel.translatesAutoresizingMaskIntoConstraints = false
             heartLabel.heightAnchor.constraint(equalToConstant: self.frame.height).isActive = true

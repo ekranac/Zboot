@@ -16,32 +16,33 @@ public class RainingItem: UILabel {
 
     fileprivate var displayLink: CADisplayLink!
 
+	fileprivate var dimension = UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.pad ? 60.0 : 30.0
     fileprivate let candies = ["🍬", "🍫", "🍩", "🍭", "🍪", "🍦", "🍰", "🍡"]
     fileprivate let fruitsAndVeggies = ["🥔", "🍐", "🥝", "🥑", "🥕", "🍆", "🍋"]
 
-    dynamic var wasCaught = false
+	@objc dynamic var wasCaught = false
     fileprivate var isObserved = false
     var type: RainingItemType!
 
     public init(controller: UIViewController) {
         guard let gameController = controller as? GameViewController else {
             super.init(frame: CGRect(x: Double(controller.view.frame.width / 2.0),
-                                     y: -35.0,
-                                     width: 30.0,
-                                     height: 30.0))
+                                     y: -(dimension+5.0),
+                                     width: dimension,
+                                     height: dimension))
             return
         }
         self.controller = gameController
         self.rootView = controller.view
 
         let randomXPosition = Double(arc4random_uniform(
-            UInt32(rootView.frame.width - 30.0)))
+            UInt32(rootView.frame.width - CGFloat(dimension))))
         super.init(frame: CGRect(x: randomXPosition,
-                                 y: -35.0, // Start off the screen, on top
-                                 width: 30.0,
-                                 height: 30.0))
+                                 y: -(dimension+5.0), // Start off the screen, on top
+                                 width: dimension,
+                                 height: dimension))
         self.textAlignment = .center
-        self.font = UIFont(name: "Avenir-Medium", size: 30.0)
+		self.font = UIFont(name: "Avenir-Medium", size: CGFloat(dimension))
         let isGood = arc4random_uniform(2) == 1
         if isGood {
             self.text = candies[Int(arc4random_uniform(UInt32(candies.count)))]
@@ -66,7 +67,7 @@ public class RainingItem: UILabel {
 
     func fall() {
         UIView.animate(withDuration: 10.0, animations: {() in
-            let translationY = self.rootView.frame.height + 35.0
+			let translationY = self.rootView.frame.height + (CGFloat(self.dimension) + 5.0)
             let translateTransform = CGAffineTransform.init(translationX: 0.0,
                                                             y: translationY)
             self.transform = translateTransform
@@ -85,7 +86,7 @@ public class RainingItem: UILabel {
         }
 
         if currentFrame.origin.y < controller.bucket.frame.origin.y &&
-            currentFrame.origin.y > (controller.bucket.frame.origin.y - 20.0) &&
+            currentFrame.origin.y > (controller.bucket.frame.origin.y - (CGFloat(dimension) - 10.0)) &&
             controller.bucket.frame.intersects(currentFrame) {
             self.removeFromSuperview()
         }
