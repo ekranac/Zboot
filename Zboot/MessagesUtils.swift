@@ -17,6 +17,7 @@ public class MessagesUtils {
     static let tagStartGameButton = 103
     static let tagGameOverLabel = 104
     static let tagRetryGameButton = 105
+	static let tagShareHighScoreButton = 106
 
     fileprivate var parentController: UIViewController!
     fileprivate let goodMessages = ["Woop! 🙌", "👍👍👍", "Keep it up!", "Wow... 😮", "Nice catch 😃",
@@ -58,6 +59,7 @@ public class MessagesUtils {
                                                      withExtension: "ttf") else {
                                                         return
         }
+		
         CTFontManagerRegisterFontsForURL(pixelatedFontUrl as CFURL, .process, nil)
         titleLabel.font = UIFont(name: "PressStart2P-Regular", size: 40.0)
 
@@ -78,6 +80,7 @@ public class MessagesUtils {
         guard let parentView = parentController.view else {
             return
         }
+		
         let gameOverLabel = UILabel(frame: CGRect(x: 0.0,
                                                   y: parentView.frame.height / 2,
                                                   width: parentView.frame.width,
@@ -92,17 +95,32 @@ public class MessagesUtils {
         CTFontManagerRegisterFontsForURL(pixelatedFontUrl as CFURL, .process, nil)
         gameOverLabel.font = UIFont(name: "PressStart2P-Regular", size: 20.0)
 
+		let retryButtonDelta = CGFloat(didAchieveHighScore ? -50.0 : 50.0)
         let retryButton = UIButton(frame: CGRect(x: 0.0,
-                                                 y: parentView.frame.height / 2 + 50.0,
+                                                 y: parentView.frame.height / 2 + retryButtonDelta,
                                                  width: parentView.frame.width,
                                                  height: 20.0))
         retryButton.tag = MessagesUtils.tagRetryGameButton
-        retryButton.setTitle("RETRY", for: .normal)
+        retryButton.setTitle(didAchieveHighScore ? "PLAY AGAIN" : "RETRY", for: .normal)
         retryButton.setTitleColor(UIColor(rgb: 0xFFAA00), for: .normal)
         retryButton.titleLabel?.font = UIFont(name: "PressStart2P-Regular", size: 17.0)
 
         parentView.addSubview(gameOverLabel)
         parentView.addSubview(retryButton)
+		guard didAchieveHighScore
+		else {
+			return
+		}
+		
+		let shareHighScoreButton = UIButton(frame: CGRect(x: 0.0,
+			y: parentView.frame.height / 2 + 50.0,
+			width: parentView.frame.width,
+			height: 30.0))
+		shareHighScoreButton.tag = MessagesUtils.tagShareHighScoreButton
+		shareHighScoreButton.setTitle("SHARE", for: .normal)
+		shareHighScoreButton.setTitleColor(UIColor(rgb: 0xFFAA00), for: .normal)
+		shareHighScoreButton.titleLabel?.font = UIFont(name: "PressStart2P-Regular", size: 20.0)
+		parentView.addSubview(shareHighScoreButton)
     }
 
     public func showScreenMessage(didCatchCandy caught: Bool) {
