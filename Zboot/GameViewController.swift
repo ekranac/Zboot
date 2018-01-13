@@ -89,11 +89,6 @@ class GameViewController: UIViewController {
         startGameButton.addTarget(self, action: #selector(setGameState), for: .touchUpInside)
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
     override var prefersStatusBarHidden: Bool {
         return true
     }
@@ -107,6 +102,17 @@ class GameViewController: UIViewController {
             break
         }
     }
+	
+	@objc fileprivate func shareHighScore() {
+		guard let highScore = highScore
+		else {
+			return
+		}
+		
+		let shareText = "Just reached a new high score of \(highScore) in Zboot! Check it out here: https://apple.co/2D6EYMC"
+		let shareController = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
+		present(shareController, animated: true, completion: nil)
+	}
 
     func startOrResumeGame() {
         candyRainTimer = scheduleNewCandyRainTimer(controller: self, withTimeInterval: interval)
@@ -126,6 +132,7 @@ class GameViewController: UIViewController {
             messages.removeView(withTag: MessagesUtils.tagStartGameButton)
             messages.removeView(withTag: MessagesUtils.tagGameOverLabel)
             messages.removeView(withTag: MessagesUtils.tagRetryGameButton)
+			messages.removeView(withTag: MessagesUtils.tagShareHighScoreButton)
             score = 0
             heartsLeft = 3
             interval = 1.0
@@ -156,6 +163,8 @@ class GameViewController: UIViewController {
 
     fileprivate func endGame() {
         let newHighScore = highScore < score
+		messages.showGameOver(didAchieveHighScore: newHighScore)
+
         if newHighScore {
             highScore = score
             UserDefaults.standard.set(highScore, forKey: highScoreKey)
@@ -181,12 +190,19 @@ class GameViewController: UIViewController {
                     self.confettiView.stopConfetti()
                 })
             }
+			
+			guard let shareButton = messages.getViewWithTag(tag: MessagesUtils.tagShareHighScoreButton) as? UIButton
+			else {
+				return
+			}
+			
+			shareButton.addTarget(self, action: #selector(shareHighScore), for: .touchUpInside)
         }
         candyRainTimer.invalidate()
-        messages.showGameOver(didAchieveHighScore: newHighScore)
         gameStateButton.isHidden = true
 
-        guard let retryButton = messages.getViewWithTag(tag: MessagesUtils.tagRetryGameButton) as? UIButton else {
+        guard let retryButton = messages.getViewWithTag(tag: MessagesUtils.tagRetryGameButton) as? UIButton
+		else {
             return
         }
 
